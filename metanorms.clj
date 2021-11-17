@@ -2,21 +2,32 @@
 ; define turtles
 ; surely this isn't the right way to do this...
 (defn make-turtle [name]
-  (def name 
+  ; A turtle is a function with a unique name (otherwise it will overwrite
+  ; another turtle, I guess)
+  (defn name [cmd & args] ; simple cmds can return turtle parameter values
     (def boldness (rand-int 8))
     (def vengefulness (rand-int 8))
     (def meta-vengefulness (rand-int 8))
     (def utility 0)
+    (cond 
+      ((= cmd "move")
+       (if (> boldness (rand-int))
+         (
+          (def utility (+ 3 utility))
+          (other-turtles name (fn [turtle]
+                                (turtle lose-utility 1))))))
+;      ((= cmd "lose-utility") (lose-utility ))
+      ((= cmd "boldness") boldness)
+      ((= cmd "vengefulness") vengefulness)
+      ((= cmd "meta-vengefulness") meta-vengefulness)
+      ((= cmd "utility") utility)
+      (:else)
     )
-  )
-; turtles should be a function
-(defn make-turtle [name]
-  (defn name []
+  ))
     ; ensure unique name?
     ; move mechanics
     ; update estimate of being punished?
     ; find all the other turtles?
-    ))
 ; define world/clock/population
 (def population
   (map 
@@ -26,9 +37,15 @@
       (range 100))))
 ; define interactions
 (defn make-move [self]
-  (self f))
-(defn other-turtles [self]
-  (filter population 
+  (if (< (rand-int 8) (self boldness))
+    ((self add-wealth 3)
+     (other-turtles self add-wealth -1))
+    (
+     ; do nothing
+     )))
+(defn other-turtles 
+  ([self] (filter population #(not (= self))))
+  ([self f] (map f (other-turtles self))))
 
 ; loop over them
 (defn tick [agentset]
